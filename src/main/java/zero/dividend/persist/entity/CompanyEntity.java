@@ -5,7 +5,6 @@ import lombok.*;
 
 @Entity(name = "COMPANY")
 @Getter
-@Setter
 @ToString
 @NoArgsConstructor
 public class CompanyEntity {
