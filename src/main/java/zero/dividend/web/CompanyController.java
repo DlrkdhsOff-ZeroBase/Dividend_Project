@@ -1,4 +1,4 @@
-package zero.dividend.controller;
+package zero.dividend.web;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
