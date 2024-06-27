@@ -2,6 +2,7 @@ package zero.dividend.persist.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import zero.dividend.model.Company;
 
 @Entity(name = "COMPANY")
 @Getter
@@ -17,4 +18,9 @@ public class CompanyEntity {
     private String ticker;
 
     private String name;
+
+    public CompanyEntity(Company company) {
+        this.ticker = company.getTicker();
+        this.name = company.getName();
+    }
 }
