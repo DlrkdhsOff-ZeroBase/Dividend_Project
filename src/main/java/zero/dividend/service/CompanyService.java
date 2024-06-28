@@ -1,6 +1,7 @@
 package zero.dividend.service;
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.collections4.Trie;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,10 +15,13 @@ import zero.dividend.persist.entity.DividendEntity;
 import zero.dividend.scraper.Scraper;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class CompanyService {
+
+    private final Trie trie;
 
     private final Scraper yahooFinanceScraper;
 
@@ -55,5 +59,18 @@ public class CompanyService {
 
         this.dividendRepository.saveAll(dividendEntities);
         return company;
+    }
+
+    public void addAutoCompleteKeyWord(String keyword) {
+        this.trie.put(keyword, null);
+    }
+
+    public List<String> autoComplete(String keyword) {
+        return (List<String>) this.trie.prefixMap(keyword).keySet()
+                .stream().collect(Collectors.toList());
+    }
+
+    public void deleteAutoCompleteKeyWord(String keyword) {
+        this.trie.remove(keyword);
     }
 }
