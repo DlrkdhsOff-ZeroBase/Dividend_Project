@@ -3,6 +3,7 @@ package zero.dividend.service;
 import lombok.AllArgsConstructor;
 import org.apache.commons.collections4.Trie;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -14,6 +15,7 @@ import zero.dividend.persist.entity.CompanyEntity;
 import zero.dividend.persist.entity.DividendEntity;
 import zero.dividend.scraper.Scraper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class CompanyService {
 
-    private final Trie trie;
+    private final Trie<String, String> trie;
 
     private final Scraper yahooFinanceScraper;
 
@@ -66,11 +68,19 @@ public class CompanyService {
     }
 
     public List<String> autoComplete(String keyword) {
-        return (List<String>) this.trie.prefixMap(keyword).keySet()
-                .stream().collect(Collectors.toList());
+        return new ArrayList<>(this.trie.prefixMap(keyword).keySet());
     }
 
     public void deleteAutoCompleteKeyWord(String keyword) {
         this.trie.remove(keyword);
+    }
+
+    public List<String> getCompanyNamesByKeyword(String keyword) {
+        Pageable limit = PageRequest.of(0, 10);
+        Page<CompanyEntity> companyEntities = this.companyRepository.findByNameStartingWithIgnoreCase(keyword, limit);
+
+        return companyEntities.stream()
+                .map(CompanyEntity::getName)
+                .collect(Collectors.toList());
     }
 }
