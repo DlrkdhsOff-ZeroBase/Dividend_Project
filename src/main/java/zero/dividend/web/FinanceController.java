@@ -1,17 +1,22 @@
 package zero.dividend.web;
 
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import zero.dividend.service.FinanceService;
 
 @RestController
-@RequestMapping
+@RequestMapping("/finance")
+@AllArgsConstructor
 public class FinanceController {
 
-    @GetMapping("/finance/dividend/{companyName}")
-    public ResponseEntity<?> searchFinance(@PathVariable String companyName) {
-        return null;
+    private final FinanceService financeService;
+    @GetMapping("/dividend/{companyName}")
+    public ResponseEntity<?> searchFinance(@PathVariable("companyName") String companyName) {
+        var result = this.financeService.getDividendByCompanyName(companyName);
+        return ResponseEntity.ok(result);
     }
 }
