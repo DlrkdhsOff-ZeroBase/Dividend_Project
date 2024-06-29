@@ -2,21 +2,24 @@ package zero.dividend.scheduler;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import zero.dividend.model.Company;
 import zero.dividend.model.ScrapedResult;
+import zero.dividend.model.constants.CacheKey;
 import zero.dividend.persist.CompanyRepository;
 import zero.dividend.persist.DividendRepository;
 import zero.dividend.persist.entity.CompanyEntity;
 import zero.dividend.persist.entity.DividendEntity;
 import zero.dividend.scraper.Scraper;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
 @Component
+@EnableCaching
 @AllArgsConstructor
 public class ScraperScheduler {
 
@@ -25,27 +28,14 @@ public class ScraperScheduler {
 
     private final DividendRepository dividendRepository;
 
-//    @Scheduled(fixedDelay = 1000)
-//    public void test1() throws InterruptedException {
-//        Thread.sleep(10000);
-//        System.out.println(Thread.currentThread().getName() + " -> 테스트1 : " + LocalDateTime.now());
-//    }
-//
-//    @Scheduled(fixedDelay = 1000)
-//    public void test2() throws InterruptedException {
-//        System.out.println(Thread.currentThread().getName() + " -> 테스트2 : " + LocalDateTime.now());
-//    }
-
+    @CacheEvict(value = CacheKey.KEY_FINANCE, allEntries = true)
     @Scheduled(cron = "${scheduler.scrap.yahoo}")
     public void yahooFinanceScheduling() {
         List<CompanyEntity> companies = this.companyRepository.findAll();
 
         for (var company : companies) {
             log.info("scraping scheduler is started -> {}", company.getName());
-            ScrapedResult scrapedResult = this.yahooFinanceScraper.scrap(Company.builder()
-                    .name(company.getName())
-                    .ticker(company.getTicker())
-                    .build());
+            ScrapedResult scrapedResult = this.yahooFinanceScraper.scrap(new Company(company.getTicker(), company.getName()));
 
             scrapedResult.getDividends().stream()
                     .map(e -> new DividendEntity(company.getId(), e))
