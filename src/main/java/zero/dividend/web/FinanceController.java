@@ -14,8 +14,11 @@ import zero.dividend.service.FinanceService;
 public class FinanceController {
 
     private final FinanceService financeService;
+
     @GetMapping("/dividend/{companyName}")
     public ResponseEntity<?> searchFinance(@PathVariable("companyName") String companyName) {
+        System.out.println("FinanceController companyName = " + companyName);
+
         var result = this.financeService.getDividendByCompanyName(companyName);
         return ResponseEntity.ok(result);
     }
