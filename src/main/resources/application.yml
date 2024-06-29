@@ -21,6 +21,11 @@ spring:
     password:
     driverClassName: org.h2.Driver
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 scheduler:
   scrap:
     yahoo: "0 0 0 * * *"
