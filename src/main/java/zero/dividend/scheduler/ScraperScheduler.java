@@ -25,18 +25,18 @@ public class ScraperScheduler {
 
     private final DividendRepository dividendRepository;
 
-    @Scheduled(fixedDelay = 1000)
-    public void test1() throws InterruptedException {
-        Thread.sleep(10000);
-        System.out.println(Thread.currentThread().getName() + " -> 테스트1 : " + LocalDateTime.now());
-    }
+//    @Scheduled(fixedDelay = 1000)
+//    public void test1() throws InterruptedException {
+//        Thread.sleep(10000);
+//        System.out.println(Thread.currentThread().getName() + " -> 테스트1 : " + LocalDateTime.now());
+//    }
+//
+//    @Scheduled(fixedDelay = 1000)
+//    public void test2() throws InterruptedException {
+//        System.out.println(Thread.currentThread().getName() + " -> 테스트2 : " + LocalDateTime.now());
+//    }
 
-    @Scheduled(fixedDelay = 1000)
-    public void test2() throws InterruptedException {
-        System.out.println(Thread.currentThread().getName() + " -> 테스트2 : " + LocalDateTime.now());
-    }
-
-//    @Scheduled(cron = "${scheduler.scrap.yahoo}")
+    @Scheduled(cron = "${scheduler.scrap.yahoo}")
     public void yahooFinanceScheduling() {
         List<CompanyEntity> companies = this.companyRepository.findAll();
 
