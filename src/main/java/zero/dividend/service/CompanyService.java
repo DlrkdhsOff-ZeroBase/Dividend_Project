@@ -17,6 +17,7 @@ import zero.dividend.scraper.Scraper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,5 +82,16 @@ public class CompanyService {
         return companyEntities.stream()
                 .map(CompanyEntity::getName)
                 .collect(Collectors.toList());
+    }
+
+    public String deleteCompany(String ticker) {
+        var company = this.companyRepository.findByTicker(ticker)
+                .orElseThrow(() -> new RuntimeException("존재하지 않은 회사 입니다."));
+
+        this.dividendRepository.deleteAllByCompanyId(company.getId());
+        this.companyRepository.delete(company);
+
+        this.addAutoCompleteKeyWord(company.getName());
+        return company.getName();
     }
 }
