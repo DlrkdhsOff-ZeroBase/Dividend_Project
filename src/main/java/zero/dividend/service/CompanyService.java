@@ -56,8 +56,7 @@ public class CompanyService {
 
         CompanyEntity companyEntity = this.companyRepository.save(new CompanyEntity(company));
         List<DividendEntity> dividendEntities = scrapedResult.getDividends().stream()
-                .map(e -> new DividendEntity(companyEntity.getId(), e))
-                .toList();
+                .map(e -> new DividendEntity(companyEntity.getId(), e)).collect(Collectors.toList());
 
         this.dividendRepository.saveAll(dividendEntities);
         return company;

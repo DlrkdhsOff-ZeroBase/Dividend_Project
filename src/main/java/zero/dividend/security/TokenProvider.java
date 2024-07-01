@@ -6,8 +6,12 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import zero.dividend.service.MemberService;
 
 import java.util.Date;
 import java.util.List;
@@ -16,47 +20,53 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TokenProvider {
 
+    private static final long TOKEN_EXPIRE_TIME = 1000 * 60 * 60;
     private static final String KEY_ROLES = "roles";
 
-    private static final long TOKEN_EXPIRE_TIME = 1000 * 60 * 60;
+    private final MemberService memberService;
 
     @Value("${spring.jwt.secret}")
     private String secretKey;
 
-    public String generateToken(String userName, List<String> roles) {
-        Claims claims = Jwts.claims().setSubject(userName);
+    public String generateToken(String username, List<String> roles){
+        Claims claims = Jwts.claims().setSubject(username);
+        claims.put(KEY_ROLES,roles);
 
-        claims.put(KEY_ROLES, roles);
-
-        var now = new Date();
-        var expiredDate = new Date(now.getTime() + TOKEN_EXPIRE_TIME);
+        Date now = new Date();
+        Date expireTime = new Date(now.getTime() + TOKEN_EXPIRE_TIME);
 
         return Jwts.builder()
-                    .setClaims(claims)
-                    .setIssuedAt(now)
-                    .setExpiration(expiredDate)
-                    .signWith(SignatureAlgorithm.HS512, this.secretKey)
-                    .compact();
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(expireTime)
+                .signWith(SignatureAlgorithm.HS512,secretKey) // 해싱 알고리즘
+                .compact();
+
     }
 
-    public String getUserName(String token) {
+    public String getUsername(String token){
         return this.parseClaims(token).getSubject();
     }
 
-    public boolean validateToken(String token) {
-        if (!StringUtils.hasText(token)) {
-            return false;
-        }
+    public boolean validateToken(String token){
 
-        var claims = this.parseClaims(token);
+        if(!StringUtils.hasText(token)) return false;
+
+        Claims claims = this.parseClaims(token);
+
         return !claims.getExpiration().before(new Date());
     }
 
-    private Claims parseClaims(String token) {
-        try {
-            return Jwts.parser().setSigningKey(this.secretKey).parseClaimsJws(token).getBody();
-        } catch (ExpiredJwtException e) {
+    private Claims parseClaims(String token){
+        try{
+            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        }catch(ExpiredJwtException e){
             return e.getClaims();
         }
+    }
+
+    public Authentication getAuthentication(String token){
+        UserDetails userDetails = memberService.loadUserByUsername(this.getUsername(token));
+        return new UsernamePasswordAuthenticationToken(userDetails,"",userDetails.getAuthorities());
     }
 }

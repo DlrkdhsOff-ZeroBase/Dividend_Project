@@ -1,6 +1,6 @@
 package zero.dividend.persist.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 import zero.dividend.model.Company;
 
