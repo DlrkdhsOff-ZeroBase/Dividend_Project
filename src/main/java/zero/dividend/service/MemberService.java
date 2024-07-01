@@ -27,7 +27,7 @@ public class MemberService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         return this.memberRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않은 회원 입니다. -> " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("not found username -> " + username));
     }
 
     public MemberEntity register(Auth.SignUp member){
@@ -44,11 +44,11 @@ public class MemberService implements UserDetailsService {
 
     public MemberEntity authenticate(Auth.SignIn member){
         MemberEntity user = memberRepository.findByUsername(member.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않은 회원 입니다. -> " + member.getUsername()));
+                .orElseThrow(() -> new UsernameNotFoundException("not found username -> " + member.getUsername()));
 
 
         if(this.passwordEncoder.matches(this.passwordEncoder.encode(member.getPassword()), user.getPassword())){
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            throw new RuntimeException("password not matched");
         }
         return user;
     }

@@ -36,7 +36,7 @@ public class CompanyService {
         boolean exists = this.companyRepository.existsByTicker(ticker);
 
         if (exists) {
-            throw new RuntimeException("이미 존재하는 회사 입니다.-> " + ticker);
+            throw new RuntimeException("failed to scrap ticker -> ");
         }
 
         return this.storeCompanyAndDividend(ticker);
@@ -50,7 +50,7 @@ public class CompanyService {
         Company company = this.yahooFinanceScraper.scrapCompanyByTicker(ticker);
 
         if (ObjectUtils.isEmpty(company)) {
-            throw new RuntimeException("잘못된 회사 정보 입니다. -> " + ticker);
+            throw new RuntimeException("failed to scrap ticker -> " + ticker);
         }
 
         ScrapedResult scrapedResult = this.yahooFinanceScraper.scrap(company);
