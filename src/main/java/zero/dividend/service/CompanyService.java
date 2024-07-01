@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import zero.dividend.exception.impl.NoCompanyException;
 import zero.dividend.model.Company;
 import zero.dividend.model.ScrapedResult;
 import zero.dividend.persist.CompanyRepository;
@@ -17,7 +18,6 @@ import zero.dividend.scraper.Scraper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +36,7 @@ public class CompanyService {
         boolean exists = this.companyRepository.existsByTicker(ticker);
 
         if (exists) {
-            throw new RuntimeException("already exists ticker -> " + ticker);
+            throw new RuntimeException("이미 존재하는 회사 입니다.-> " + ticker);
         }
 
         return this.storeCompanyAndDividend(ticker);
@@ -50,7 +50,7 @@ public class CompanyService {
         Company company = this.yahooFinanceScraper.scrapCompanyByTicker(ticker);
 
         if (ObjectUtils.isEmpty(company)) {
-            throw new RuntimeException("failed to scrap ticker -> " + ticker);
+            throw new RuntimeException("잘못된 회사 정보 입니다. -> " + ticker);
         }
 
         ScrapedResult scrapedResult = this.yahooFinanceScraper.scrap(company);
@@ -86,7 +86,7 @@ public class CompanyService {
 
     public String deleteCompany(String ticker) {
         var company = this.companyRepository.findByTicker(ticker)
-                .orElseThrow(() -> new RuntimeException("존재하지 않은 회사 입니다."));
+                .orElseThrow(NoCompanyException::new);
 
         this.dividendRepository.deleteAllByCompanyId(company.getId());
         this.companyRepository.delete(company);
