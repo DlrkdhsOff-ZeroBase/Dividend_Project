@@ -1,8 +1,11 @@
 package zero.dividend.persist.entity;
 
-import javax.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import zero.dividend.model.Company;
+
+import javax.persistence.*;
 
 @Entity(name = "COMPANY")
 @Getter

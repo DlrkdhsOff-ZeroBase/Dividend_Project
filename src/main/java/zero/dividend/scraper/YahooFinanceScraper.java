@@ -13,7 +13,8 @@ import zero.dividend.model.constants.Month;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class YahooFinanceScraper implements Scraper {

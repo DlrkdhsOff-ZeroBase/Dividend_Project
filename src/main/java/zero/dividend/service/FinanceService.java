@@ -14,7 +14,7 @@ import zero.dividend.persist.DividendRepository;
 import zero.dividend.persist.entity.CompanyEntity;
 import zero.dividend.persist.entity.DividendEntity;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
